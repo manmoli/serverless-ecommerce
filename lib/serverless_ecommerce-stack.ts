@@ -28,11 +28,23 @@ export class ServerlessEcommerceStack extends cdk.Stack {
       }
     })
 
+    const getProductHandler = new lambda.Function(this, 'GetProductHandler', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset('src/lambda/products/get/function.zip'),
+      handler: 'index.handler',
+      environment: {
+        PRODUCT_TABLE_NAME: productTable.tableName
+      }
+    })
+
+
     productTable.grantReadWriteData(createProductHandler)
     productImagesBucket.grantReadWrite(createProductHandler)
+    productTable.grantReadData(getProductHandler)
 
     const productApi = new apiGateway.RestApi(this, 'ProductApi')
     const productResource = productApi.root.addResource('product')
     productResource.addMethod('POST', new apiGateway.LambdaIntegration(createProductHandler))
+    productResource.addMethod('GET', new apiGateway.LambdaIntegration(getProductHandler))
   }
 }
