@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk'
-import { APIGatewayEvent, APIGatewayEventDefaultAuthorizerContext, APIGatewayProxyEventBase } from 'aws-lambda'
+import { APIGatewayEvent } from 'aws-lambda'
 import { QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
@@ -28,9 +28,6 @@ export const handler = async (event: APIGatewayEvent) => {
         } else {
             results = (await dynamoDb.scan(params).promise()).Items
         }
-
-
-
 
         return {
             statusCode: 200,

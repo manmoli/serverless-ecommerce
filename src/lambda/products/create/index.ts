@@ -1,6 +1,7 @@
 import * as AWS from 'aws-sdk'
 import { APIGatewayEvent } from 'aws-lambda'
 import { v4 as uuid } from 'uuid'
+import { Product } from '../update/product.dto'
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
 const s3 = new AWS.S3()
@@ -8,13 +9,7 @@ const s3 = new AWS.S3()
 const BUCKET_NAME = process.env.PRODUCT_BUCKET_NAME
 const TABLE_NAME = process.env.PRODUCT_TABLE_NAME
 
-interface Product {
-  productId: string
-  name: string
-  description: string
-  price: number
-  imageUrl: string
-}
+
 
 export const handler = async (event: APIGatewayEvent) => {
   try {
