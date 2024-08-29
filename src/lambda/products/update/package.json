@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm -r ./dist && tsc --project ./tsconfig.json && cd dist && zip -r ../function.zip ./*"
+    "build": "rm -r ./dist && npm i --production && tsc --project ./tsconfig.json && cp -R node_modules dist/ && cd dist && zip -r ../function.zip ./*"
   },
   "author": "",
   "license": "ISC",

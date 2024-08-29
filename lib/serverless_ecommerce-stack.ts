@@ -56,8 +56,9 @@ export class ServerlessEcommerceStack extends cdk.Stack {
 
     const productApi = new apiGateway.RestApi(this, 'ProductApi')
     const productResource = productApi.root.addResource('product')
+    const productIdResource = productResource.addResource('{productId}')
     productResource.addMethod('POST', new apiGateway.LambdaIntegration(createProductHandler))
     productResource.addMethod('GET', new apiGateway.LambdaIntegration(getProductHandler))
-    productResource.addMethod('PUT', new apiGateway.LambdaIntegration(updateProductHandler))
+    productIdResource.addMethod('PUT', new apiGateway.LambdaIntegration(updateProductHandler))
   }
 }
