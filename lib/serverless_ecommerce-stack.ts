@@ -28,6 +28,15 @@ export class ServerlessEcommerceStack extends cdk.Stack {
       partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
     });
 
+    const authLambda = new lambda.Function(this, 'AuthLambda', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      code: lambda.Code.fromAsset('src/lambda/authorization/auth/function.zip'),
+      handler: 'index.handler',
+      environment: {
+        JWT_SECRET: JWT_SECRET
+      }
+    })
+
     const createUserHandler = new lambda.Function(this, 'CreateUserHandler', {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset('src/lambda/users/create/function.zip'),
@@ -113,6 +122,10 @@ export class ServerlessEcommerceStack extends cdk.Stack {
     productTable.grantReadWriteData(updateProductHandler);
     productImagesBucket.grantReadWrite(updateProductHandler);
 
+    const authorizer = new apiGateway.TokenAuthorizer(this, 'UserAuthorizer', {
+      handler: authLambda
+    })
+
     const userApi = new apiGateway.RestApi(this, 'UserApi');
     const userResource = userApi.root.addResource('user');
     userResource.addMethod('POST', new apiGateway.LambdaIntegration(createUserHandler));
@@ -125,9 +138,21 @@ export class ServerlessEcommerceStack extends cdk.Stack {
     const productApi = new apiGateway.RestApi(this, 'ProductApi');
     const productResource = productApi.root.addResource('product');
     const productIdResource = productResource.addResource('{productId}');
-    productResource.addMethod('POST', new apiGateway.LambdaIntegration(createProductHandler));
-    productResource.addMethod('GET', new apiGateway.LambdaIntegration(getProductHandler));
-    productIdResource.addMethod('PUT', new apiGateway.LambdaIntegration(updateProductHandler));
-    productIdResource.addMethod('DELETE', new apiGateway.LambdaIntegration(deleteProductHandler));
+    productResource.addMethod('POST', new apiGateway.LambdaIntegration(createProductHandler), {
+      authorizer,
+      authorizationType: apiGateway.AuthorizationType.CUSTOM
+    });
+    productResource.addMethod('GET', new apiGateway.LambdaIntegration(getProductHandler), {
+      authorizer,
+      authorizationType: apiGateway.AuthorizationType.CUSTOM
+    });
+    productIdResource.addMethod('PUT', new apiGateway.LambdaIntegration(updateProductHandler), {
+      authorizer,
+      authorizationType: apiGateway.AuthorizationType.CUSTOM
+    });
+    productIdResource.addMethod('DELETE', new apiGateway.LambdaIntegration(deleteProductHandler), {
+      authorizer,
+      authorizationType: apiGateway.AuthorizationType.CUSTOM
+    });
   }
 }

@@ -41,7 +41,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
             }
         }
         
-        const token = jwt.sign(user[0].email, JWT_SECRET)
+        const token = jwt.sign({email: user[0].email, userId: user[0].userId}, JWT_SECRET)
         
         return {
             statusCode: 200,

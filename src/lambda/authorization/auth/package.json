@@ -1,0 +1,20 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": " if [ -d ./dist ]; then rm -rf ./dist; fi",
+    "build": "npm run clean && npm i && tsc --project ./tsconfig.json && cp -R ./node_modules ./dist && cd dist && zip -r ./../function.zip ./*",
+    "deploy": "npm run build && cd ./../../../../ && cdk bootstrap -Y && cdk deploy -Y"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/jsonwebtoken": "^9.0.6",
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1688.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
